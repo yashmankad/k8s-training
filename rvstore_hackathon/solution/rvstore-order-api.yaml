@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rvstore-order-api-config
+  namespace: default
+data:
+  SPRING_PROFILES_ACTIVE: compose
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rvstore-order-api
+  labels:
+    app: rvstore-order-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rvstore-order-api
+  template:
+    metadata:
+      labels:
+        app: rvstore-order-api
+    spec:
+      containers:
+      - name: rvstore-order-api
+        image: public.ecr.aws/e7e6w2e3/rvstore-order-api
+        envFrom:
+        - configMapRef:
+            name: rvstore-order-api-config
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rvstore-order-api
+spec:
+  selector:
+    app: rvstore-order-api
+  ports:
+  - protocol: TCP
+    port: 9002
+    nodePort: 30084
+  type: NodePort
