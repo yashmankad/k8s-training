@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  labels:
+    app: database
+spec:
+  ports:
+    - port: 27017
+      name: database
+  clusterIP: None
+  selector:
+    app: database
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  serviceName: mongodb
+  replicas: 5
+  # podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: mongodb
+          image: public.ecr.aws/e7e6w2e3/rvstore-mongo
+          ports:
+            - containerPort: 27017
+              name: database
+          volumeMounts:
+            # provide name of the volumeClaimTemplate to provision a new PVC/PV per pod
+            # https://stackoverflow.com/questions/53927587/kubernetes-multiple-pvc-with-statefulset-for-each-pod-vs-single-pvc-for-all-pods
+            - name: new-pvc-per-pod
+              mountPath: /data/db
+  # creates a new PVC per pod automatically
+  # through a claim template we don't need to create a PVC per Pod
+  volumeClaimTemplates:
+  - metadata:
+      name: new-pvc-per-pod
+    spec:
+      resources:
+        requests:
+          storage: 50Mi
+      accessModes:
+        # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes
+        - ReadWriteOnce

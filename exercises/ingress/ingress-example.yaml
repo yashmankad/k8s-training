@@ -1,0 +1,47 @@
+# Reference:
+# https://kubernetes.io/docs/concepts/services-networking/ingress/
+# https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/
+#
+# Deploy nginx ingress controller:
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.41.2/deploy/static/provider/cloud/deploy.yaml
+#
+# reference: https://kubernetes.github.io/ingress-nginx/deploy/#docker-for-mac
+#
+# Create v1 app:
+# kubectl create deployment web --image=gcr.io/google-samples/hello-app:1.0
+# kubectl expose deployment web --type=NodePort --port=8080
+#
+# Create v2 app:
+# kubectl create deployment webv2 --image=gcr.io/google-samples/hello-app:2.0
+# kubectl expose deployment webv2 --type=NodePort --port=8080
+#
+# Test:
+# curl 127.0.0.1
+# curl 127.0.0.1/v2
+
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - host: 127.0.0.1
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 8080
+          - path: /v2
+            pathType: Prefix
+            backend:
+              service:
+                name: webv2
+                port:
+                  number: 8080
