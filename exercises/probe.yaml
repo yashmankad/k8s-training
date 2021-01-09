@@ -15,7 +15,9 @@ spec:
       initialDelaySeconds: 3
       periodSeconds: 3
       failureThreshold: 2
+
 ---
+
 kind: Service
 apiVersion: v1
 metadata:

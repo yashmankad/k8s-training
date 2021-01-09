@@ -26,6 +26,7 @@ spec:
   resources:
     requests:
       storage: 10Mi
+
 ---
 
 apiVersion: apps/v1

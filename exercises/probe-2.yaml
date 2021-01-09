@@ -35,7 +35,9 @@ spec:
       - name: random-wait
         image: busybox:1.28
         command: ['sh', '-c', 'echo Sleeping...; sleep $((RANDOM % 30)); echo Done;']
+
 ---
+
 kind: Service
 apiVersion: v1
 metadata:
